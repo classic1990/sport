@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getTeamById, getImagesByTeam } from '../services/firestore';
 import ImageCard from '../components/Image/ImageCard';
 import ImageModal from '../components/Image/ImageModal';
+import LoadingSkeleton from '../components/UI/LoadingSkeleton';
 
 export default function Team() {
   const { teamId } = useParams();
@@ -32,14 +33,7 @@ export default function Team() {
   }, [teamId]);
 
   if (!team) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-2 border-gray-600 border-t-accent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">กำลังโหลด...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSkeleton type="hero" />;
   }
 
   const filteredImages = activeFilter === 'all'
@@ -47,83 +41,97 @@ export default function Team() {
     : images.filter(img => img.type === activeFilter);
 
   return (
-    <div className="min-h-screen">
-      {/* Team Header */}
-      <div className={`relative w-full h-64 md:h-80 bg-gradient-to-br ${team.gradient} overflow-hidden border-b border-gray-800`}>
-        {/* Decor */}
-        <div className="absolute -right-20 -bottom-20 opacity-10 mix-blend-overlay">
-          <img src={team.logo} className="w-96 h-96 object-contain filter grayscale" alt="decor" />
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+      {/* Skip to main content for accessibility */}
+      <a href="#team-content" className="skip-link">
+        ข้ามไปยังเนื้อหาหลัก
+      </a>
+
+      {/* Premium Team Header */}
+      <div className="relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-gold/10 to-transparent opacity-30"></div>
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-t from-darker to-transparent" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            {/* Team Logo */}
+            <div className="mb-8 relative inline-block">
+              <div className="absolute inset-0 bg-gradient-to-r from-gold to-gold/20 rounded-full blur-2xl animate-pulse"></div>
+              <div className="relative bg-gradient-to-br from-gray-900 to-black p-8 rounded-3xl border border-gold/30 shadow-2xl inline-block">
+                <img
+                  src={team.logo}
+                  alt={team.name}
+                  className="w-32 h-32 md:w-48 md:h-48 object-contain filter drop-shadow-2xl"
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+              </div>
+            </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-end pb-10 relative z-10">
-          <div className="flex items-center gap-6">
-            <div className="w-24 h-24 md:w-32 md:h-32 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 shadow-2xl">
-              <img src={team.logo} alt={team.name} className="w-full h-full object-contain drop-shadow-xl" />
-            </div>
-            <div>
-              <Link
-                to="/"
-                className="text-gray-400 hover:text-white text-sm mb-2 flex items-center gap-1 transition-colors"
-              >
-                <i className="fa-solid fa-chevron-left"></i> กลับไปหน้าหลัก
+            {/* Team Name */}
+            <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight">
+              <span className="text-white">{team.thaiName}</span>
+            </h1>
+            <p className="text-2xl md:text-3xl text-gradient-gold font-bold mb-4">
+              {team.name}
+            </p>
+
+            {/* Breadcrumb */}
+            <nav className="flex justify-center items-center space-x-2 text-sm text-gray-400 mb-8">
+              <Link to="/" className="hover:text-gold transition-colors">หน้าแรก</Link>
+              <span>/</span>
+              <Link to={`/league/${team.leagueId}`} className="hover:text-gold transition-colors">
+                {team.leagueName}
               </Link>
-              <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">
-                {team.thaiName}
-              </h1>
-              <p className="text-gray-300 mt-2 font-medium">{team.name} Graphic Resources</p>
-            </div>
+              <span>/</span>
+              <span className="text-gold">{team.thaiName}</span>
+            </nav>
           </div>
         </div>
       </div>
 
-      {/* Filter & Gallery Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs */}
-        <div className="flex overflow-x-auto no-scrollbar gap-2 mb-8 border-b border-gray-800 pb-4">
-          <button
-            onClick={() => setActiveFilter('all')}
-            className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-semibold transition-colors ${activeFilter === 'all'
-              ? 'bg-gray-800 text-white'
-              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-              }`}
-          >
-            ทั้งหมด
-          </button>
-          <button
-            onClick={() => setActiveFilter('cutout')}
-            className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-semibold transition-colors ${activeFilter === 'cutout'
-              ? 'bg-gray-800 text-white'
-              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-              }`}
-          >
-            รูปไดคัท (Cut-outs)
-          </button>
-          <button
-            onClick={() => setActiveFilter('action')}
-            className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-semibold transition-colors ${activeFilter === 'action'
-              ? 'bg-gray-800 text-white'
-              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-              }`}
-          >
-            แอ็คชั่นช็อต
-          </button>
-          <button
-            onClick={() => setActiveFilter('logo')}
-            className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-semibold transition-colors ${activeFilter === 'logo'
-              ? 'bg-gray-800 text-white'
-              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-              }`}
-          >
-            โลโก้ & กราฟิก
-          </button>
+      {/* Premium Divider */}
+      <div className="relative py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="w-2 h-2 bg-gold rounded-full shadow-lg shadow-gold/50"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div id="team-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          {['all', 'player', 'celebration', 'action'].map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setActiveFilter(filter)}
+              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${activeFilter === filter
+                ? 'bg-gradient-to-r from-gold to-gold-dark text-black shadow-lg'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
+                }`}
+            >
+              {filter === 'all' && 'ทั้งหมด'}
+              {filter === 'player' && 'นักเตะ'}
+              {filter === 'celebration' && 'ฉลอง'}
+              {filter === 'action' && 'จังหวะ'}
+            </button>
+          ))}
         </div>
 
-        {/* Gallery Grid */}
-        {filteredImages.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            {filteredImages.map(image => (
+        {/* Images Grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <LoadingSkeleton key={`skeleton-${index}`} />
+            ))}
+          </div>
+        ) : filteredImages.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredImages.map((image) => (
               <ImageCard
                 key={image.id}
                 image={image}
@@ -132,29 +140,23 @@ export default function Team() {
             ))}
           </div>
         ) : (
-          <div className="py-20 text-center flex flex-col items-center">
-            <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mb-4 border border-gray-700">
-              <i className="fa-solid fa-camera-retro text-3xl text-gray-600"></i>
+          <div className="text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center">
+              <i className="fas fa-images text-3xl text-gray-600"></i>
             </div>
-            <h3 className="text-xl font-bold text-gray-300 mb-2">
-              ยังไม่มีรูปภาพสำหรับทีมนี้
-            </h3>
-            <p className="text-gray-500 mb-6">
-              ทีมงานกำลังทยอยอัปเดตไฟล์ไดคัทของทีม {team.thaiName} เร็วๆ นี้
-            </p>
-            <button className="bg-gray-800 text-white px-6 py-2 rounded-full font-medium hover:bg-gray-700 transition border border-gray-600">
-              <i className="fa-solid fa-bell mr-2"></i> แจ้งเตือนเมื่อมีการอัปเดต
-            </button>
+            <h3 className="text-xl font-bold text-white mb-2">ไม่พบรูปภาพ</h3>
+            <p className="text-gray-400">ยังไม่มีรูปภาพในหมวดหมู่นี้</p>
           </div>
         )}
       </div>
 
       {/* Image Modal */}
-      <ImageModal
-        image={selectedImage}
-        isOpen={!!selectedImage}
-        onClose={() => setSelectedImage(null)}
-      />
+      {selectedImage && (
+        <ImageModal
+          image={selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   );
 }

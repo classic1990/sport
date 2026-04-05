@@ -23,11 +23,24 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check for saved admin session in localStorage
+    const savedSession = localStorage.getItem('adminSession');
+    const sessionExpiry = localStorage.getItem('adminSessionExpiry');
+
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
+        // Check if we have a valid saved session
+        if (savedSession && sessionExpiry && new Date().getTime() < parseInt(sessionExpiry)) {
+          // Session is still valid, don't redirect
+          console.log('Using saved admin session');
+          return;
+        }
         navigate('/admin/login');
       } else {
         setUser(user);
+        // Save session for 7 days
+        localStorage.setItem('adminSession', 'true');
+        localStorage.setItem('adminSessionExpiry', (new Date().getTime() + (7 * 24 * 60 * 60 * 1000)).toString());
       }
     });
     fetchRecentImages();
@@ -46,6 +59,10 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = async () => {
+    // Clear admin session from localStorage
+    localStorage.removeItem('adminSession');
+    localStorage.removeItem('adminSessionExpiry');
+
     await signOut(auth);
     navigate('/admin/login');
   };

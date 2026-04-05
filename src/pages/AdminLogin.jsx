@@ -31,6 +31,9 @@ export default function AdminLogin() {
 
       // Check if email is admin
       if (ADMIN_EMAILS.includes(result.user.email)) {
+        // Save admin session for 7 days
+        localStorage.setItem('adminSession', 'true');
+        localStorage.setItem('adminSessionExpiry', (new Date().getTime() + (7 * 24 * 60 * 60 * 1000)).toString());
         navigate('/admin');
       } else {
         // Not admin, redirect to home
@@ -53,6 +56,9 @@ export default function AdminLogin() {
 
       // Check if email is admin
       if (ADMIN_EMAILS.includes(result.user.email)) {
+        // Save admin session for 7 days
+        localStorage.setItem('adminSession', 'true');
+        localStorage.setItem('adminSessionExpiry', (new Date().getTime() + (7 * 24 * 60 * 60 * 1000)).toString());
         navigate('/admin');
       } else {
         // Not admin, show message and redirect to home
